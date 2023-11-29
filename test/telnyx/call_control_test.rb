@@ -158,7 +158,7 @@ module Telnyx
     end
 
     def format_action_url(call, action)
-      "#{Telnyx.api_base}/v2/calls/#{call.call_control_id}/actions/#{action}"
+      "#{Telnyx.api_base}/calls/#{call.call_control_id}/actions/#{action}"
     end
   end
 end

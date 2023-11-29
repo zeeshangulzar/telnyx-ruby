@@ -6,7 +6,7 @@ module Telnyx
   class ConnectionTest < Test::Unit::TestCase
     should "list connections" do
       connections = Connection.list
-      assert_requested :get, "#{Telnyx.api_base}/v2/connections"
+      assert_requested :get, "#{Telnyx.api_base}/connections"
       assert_kind_of ListObject, connections
       assert connections.first.is_a?(Connection) ||
              connections.first.is_a?(IPConnection) ||
@@ -17,7 +17,7 @@ module Telnyx
 
     should "retrieve a connection" do
       connection = Connection.retrieve("id")
-      assert_requested :get, "#{Telnyx.api_base}/v2/connections/id"
+      assert_requested :get, "#{Telnyx.api_base}/connections/id"
       assert connection.is_a?(Connection) ||
              connection.is_a?(IPConnection) ||
              connection.is_a?(FQDNConnection) ||

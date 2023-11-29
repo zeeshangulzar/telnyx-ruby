@@ -33,7 +33,7 @@ module Telnyx
       return "/v2/#{resource_path(inner_id)}" if respond_to?("resource_path")
       return "/v2/#{self::RESOURCE_PATH}" if const_defined?("RESOURCE_PATH")
 
-      "/v2/#{self::OBJECT_NAME.downcase.tr('.', '/')}s"
+      "/#{self::OBJECT_NAME.downcase.tr('.', '/')}s"
     end
 
     def self.identified_resource_url(id)

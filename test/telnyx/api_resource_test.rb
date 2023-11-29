@@ -59,10 +59,9 @@ module Telnyx
     context "when specifying per-object credentials" do
       context "with no global API key set" do
         should "use the per-object credential when creating" do
-          stub_post = stub_request(:post, "#{Telnyx.api_base}/v2/messaging_profiles")
+          stub_post = stub_request(:post, "#{Telnyx.api_base}/messaging_profiles")
                       .with(headers: { "Authorization" => "Bearer super-secret" })
                       .to_return(body: JSON.generate(data: messaging_profile_fixture))
-
           Telnyx::MessagingProfile.create({ name: "New Messaging Profile" },
                                           "super-secret")
           assert_requested(stub_post)
@@ -79,7 +78,7 @@ module Telnyx
         end
 
         should "use the per-object credential when creating" do
-          stub_post = stub_request(:post, "#{Telnyx.api_base}/v2/messaging_profiles")
+          stub_post = stub_request(:post, "#{Telnyx.api_base}/messaging_profiles")
                       .with(headers: { "Authorization" => "Bearer super-secret" })
                       .to_return(body: JSON.generate(data: messaging_profile_fixture))
 
@@ -92,7 +91,7 @@ module Telnyx
 
     context "with valid credentials" do
       should "urlencode values in GET params" do
-        stub_get = stub_request(:get, "#{Telnyx.api_base}/v2/messaging_profiles")
+        stub_get = stub_request(:get, "#{Telnyx.api_base}/messaging_profiles")
                    .with(query: { page: { size: 10 } })
                    .to_return(body: JSON.generate(data: [messaging_profile_fixture]))
         messaging_profiles = Telnyx::MessagingProfile.list(page: { size: 10 }).data
@@ -101,14 +100,14 @@ module Telnyx
       end
 
       should "setting a nil value for a param should exclude that param from the request" do
-        stub_get = stub_request(:get, "#{Telnyx.api_base}/v2/messaging_profiles")
+        stub_get = stub_request(:get, "#{Telnyx.api_base}/messaging_profiles")
                    .with(query: { page: { size: 5 }, sad: false })
                    .to_return(body: JSON.generate(data: [messaging_profile_fixture]))
         Telnyx::MessagingProfile.list(count: nil, page: { size: 5 }, sad: false)
 
         assert_requested(stub_get)
 
-        stub_get = stub_request(:post, "#{Telnyx.api_base}/v2/messaging_profiles")
+        stub_get = stub_request(:post, "#{Telnyx.api_base}/messaging_profiles")
                    .with(body: { "foo" => "bar" })
                    .to_return(body: JSON.generate(data: [messaging_profile_fixture]))
         Telnyx::MessagingProfile.create(name: nil, foo: "bar")
@@ -117,7 +116,7 @@ module Telnyx
       end
 
       should "requesting with a unicode ID should result in a request" do
-        stub_request(:get, "#{Telnyx.api_base}/v2/messaging_profiles/%E2%98%83")
+        stub_request(:get, "#{Telnyx.api_base}/messaging_profiles/%E2%98%83")
           .to_return(body: JSON.generate(make_resource_not_found_error), status: 404)
         mp = Telnyx::MessagingProfile.new("☃")
         assert_raises(Telnyx::ResourceNotFoundError) { mp.refresh }
@@ -129,7 +128,7 @@ module Telnyx
       end
 
       should "making a GET request with parameters should have a query string and no body" do
-        stub = stub_request(:get, "#{Telnyx.api_base}/v2/messaging_profiles")
+        stub = stub_request(:get, "#{Telnyx.api_base}/messaging_profiles")
                .with(query: { limit: 1 })
                .to_return(body: JSON.generate(data: [messaging_profile_fixture]))
         Telnyx::MessagingProfile.list(limit: 1)
@@ -138,37 +137,37 @@ module Telnyx
 
       should "making a POST request with parameters should have a body and no query string" do
         Telnyx::MessagingProfile.create(name: "New Messaging Profile")
-        assert_requested(:post, "#{Telnyx.api_base}/v2/messaging_profiles", body: { name: "New Messaging Profile" })
+        assert_requested(:post, "#{Telnyx.api_base}/messaging_profiles", body: { name: "New Messaging Profile" })
       end
 
       should "loading an object should issue a GET request" do
-        mp = Telnyx::MessagingProfile.new("123")
+        mp = Telnyx::MessagingProfile.new("7d8f749f-d825-9887-26c1-d52f1008c6a9")
         mp.refresh
-        assert_requested(:get, "#{Telnyx.api_base}/v2/messaging_profiles/123")
+        assert_requested(:get, "#{Telnyx.api_base}/messaging_profiles/7d8f749f-d825-9887-26c1-d52f1008c6a9")
       end
 
       should "using array accessors should be the same as the method interface" do
-        mp = Telnyx::MessagingProfile.new("123")
+        mp = Telnyx::MessagingProfile.new("7d8f749f-d825-9887-26c1-d52f1008c6a9")
         mp.refresh
         assert_equal mp.created_at, mp[:created_at]
         assert_equal mp.created_at, mp["created_at"]
         mp["created_at"] = 12_345
         assert_equal mp.created_at, 12_345
-        assert_requested(:get, "#{Telnyx.api_base}/v2/messaging_profiles/123")
+        assert_requested(:get, "#{Telnyx.api_base}/messaging_profiles/7d8f749f-d825-9887-26c1-d52f1008c6a9")
       end
 
       should "updating an object should issue a PATCH request with only the changed properties" do
-        stub_patch = stub_request(:patch, "#{Telnyx.api_base}/v2/messaging_profiles/123")
+        stub_patch = stub_request(:patch, "#{Telnyx.api_base}/messaging_profiles/47548cc3-1d52-1557-559a-60cdc0ec4e02")
                      .with(body: hash_including("name" => "new name"))
                      .to_return(body: JSON.generate(data: messaging_profile_fixture))
-        mp = Telnyx::MessagingProfile.retrieve("123")
+        mp = Telnyx::MessagingProfile.retrieve("47548cc3-1d52-1557-559a-60cdc0ec4e02")
         mp.name = "new name"
         mp.save
         assert_requested(stub_patch)
       end
 
       should "updating should merge in returned properties" do
-        stub_patch = stub_request(:patch, "#{Telnyx.api_base}/v2/messaging_profiles/123")
+        stub_patch = stub_request(:patch, "#{Telnyx.api_base}/messaging_profiles/123")
                      .with(body: hash_including("name" => "new name"))
                      .to_return(body: JSON.generate(data: messaging_profile_fixture))
         mp = Telnyx::MessagingProfile.new("123")
@@ -187,7 +186,7 @@ module Telnyx
       end
 
       should "updating should use the supplied api_key" do
-        stub_post = stub_request(:post, "#{Telnyx.api_base}/v2/messaging_profiles")
+        stub_post = stub_request(:post, "#{Telnyx.api_base}/messaging_profiles")
                     .with(headers: { "Authorization" => "Bearer super-secret" })
                     .to_return(body: JSON.generate(data: messaging_profile_fixture))
         mp = Telnyx::MessagingProfile.new
@@ -200,32 +199,32 @@ module Telnyx
       should "deleting should send no props and result in an object that has no props other than `deleted`" do
         mp = Telnyx::MessagingProfile.construct_from(messaging_profile_fixture)
         mp.delete
-        assert_requested(:delete, "#{Telnyx.api_base}/v2/messaging_profiles/123", body: "")
+        assert_requested(:delete, "#{Telnyx.api_base}/messaging_profiles/#{mp.id}", body: "")
       end
 
       should "loading all of an APIResource should return an array of recursively instantiated objects" do
         messaging_profiles = Telnyx::MessagingProfile.list.data
 
-        assert_requested(:get, "#{Telnyx.api_base}/v2/messaging_profiles")
+        assert_requested(:get, "#{Telnyx.api_base}/messaging_profiles")
         assert messaging_profiles.is_a? Array
         assert messaging_profiles[0].is_a? Telnyx::MessagingProfile
       end
 
       should "save nothing if nothing changes" do
         messaging_profile = Telnyx::MessagingProfile.construct_from(
-          id: "123",
+          id: "7d8f749f-d825-9887-26c1-d52f1008c6a9",
           meta: {
             key: "value",
           }
         )
 
         messaging_profile.save
-        assert_requested(:patch, "#{Telnyx.api_base}/v2/messaging_profiles/123", body: {})
+        assert_requested(:patch, "#{Telnyx.api_base}/messaging_profiles/7d8f749f-d825-9887-26c1-d52f1008c6a9", body: {})
       end
 
       should "correctly handle array noops" do
         messaging_profile = Telnyx::MessagingProfile.construct_from(
-          id: "myid",
+          id: "7d8f749f-d825-9887-26c1-d52f1008c6a9",
           legal_entity: {
             additional_owners: [{ first_name: "Bob" }],
           },
@@ -233,7 +232,7 @@ module Telnyx
         )
 
         messaging_profile.save
-        assert_requested(:patch, "#{Telnyx.api_base}/v2/messaging_profiles/myid", body: {})
+        assert_requested(:patch, "#{Telnyx.api_base}/messaging_profiles/7d8f749f-d825-9887-26c1-d52f1008c6a9", body: {})
       end
 
       should "correctly handle hash noops" do
@@ -244,7 +243,7 @@ module Telnyx
           }
         )
 
-        stub_post = stub_request(:patch, "#{Telnyx.api_base}/v2/messaging_profiles/myid")
+        stub_post = stub_request(:patch, "#{Telnyx.api_base}/messaging_profiles/myid")
                     .with(body: {})
                     .to_return(body: JSON.generate(data: { "id" => "myid" }))
 
@@ -258,14 +257,14 @@ module Telnyx
         messaging_profile.name = "my-messaging-profile"
         messaging_profile.save
 
-        assert_requested(:post, "#{Telnyx.api_base}/v2/messaging_profiles", body: { name: "my-messaging-profile" })
+        assert_requested(:post, "#{Telnyx.api_base}/messaging_profiles", body: { name: "my-messaging-profile" })
       end
 
       should "set attributes as part of save" do
         messaging_profile = Telnyx::MessagingProfile.construct_from(id: nil,
                                                                     name: nil)
 
-        stub_post = stub_request(:post, "#{Telnyx.api_base}/v2/messaging_profiles")
+        stub_post = stub_request(:post, "#{Telnyx.api_base}/messaging_profiles")
                     .with(body: { name: "telnyx", meta: { key: "value" } })
                     .to_return(body: JSON.generate(data: { "id" => "123" }))
 
@@ -278,7 +277,7 @@ module Telnyx
     setup do
       if @@fixtures.empty?
         cache_fixture(:messaging_profile) do
-          MessagingProfile.retrieve("123")
+          MessagingProfile.retrieve("7d8f749f-d825-9887-26c1-d52f1008c6a9")
         end
       end
     end

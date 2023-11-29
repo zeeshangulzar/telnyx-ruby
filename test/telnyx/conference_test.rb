@@ -8,27 +8,27 @@ module Telnyx
       @conference = Conference.create call_control_id: "foobar", name: "conference!"
     end
     should "create conference" do
-      assert_requested :post, "#{Telnyx.api_base}/v2/conferences"
+      assert_requested :post, "#{Telnyx.api_base}/conferences"
       assert_kind_of Conference, @conference
     end
 
     should "retrieve conference" do
       conference = Conference.retrieve "foobar"
       assert_kind_of Conference, conference
-      assert_requested :get, "#{Telnyx.api_base}/v2/conferences/foobar"
+      assert_requested :get, "#{Telnyx.api_base}/conferences/foobar"
     end
 
     should "list conferences" do
       conferences = Conference.list
 
-      assert_requested :get, "#{Telnyx.api_base}/v2/conferences"
+      assert_requested :get, "#{Telnyx.api_base}/conferences"
       assert_kind_of ListObject, conferences
       assert_kind_of Conference, conferences.first
     end
 
     should "list participants" do
       participants = @conference.participants
-      assert_requested :get, "#{Telnyx.api_base}/v2/conferences/#{@conference.id}/participants"
+      assert_requested :get, "#{Telnyx.api_base}/conferences/#{@conference.id}/participants"
       assert_kind_of ListObject, participants
     end
 
@@ -41,7 +41,7 @@ module Telnyx
       assert defined? @conference.start_recording
       assert defined? @conference.stop_recording
       assert defined? @conference.speak
-      assert defined? @conference.dial_participant
+      assert defined? @conference.dial_participant # error 404
       assert defined? @conference.update
     end
 
@@ -107,7 +107,7 @@ module Telnyx
     end
 
     def action_url(conf, action)
-      "#{Telnyx.api_base}/v2/conferences/#{conf.id}/actions/#{action}"
+      "#{Telnyx.api_base}/conferences/#{conf.id}/actions/#{action}"
     end
   end
 end
